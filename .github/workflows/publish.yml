@@ -8,6 +8,7 @@ on:
       - 'v*.*.*'
 
 permissions:
+  id-token: write   # OIDC（Trusted Publishing）必需，用于生成 OIDC 令牌
   contents: read
 
 jobs:
@@ -35,7 +36,6 @@ jobs:
             exit 1
           fi
 
-      - name: Publish
+      # Trusted Publishing (OIDC)：npm 自动用 OIDC 认证，无需任何长期 token
+      - name: Publish (Trusted Publishing / OIDC)
         run: npm publish --access public
-        env:
-          NODE_AUTH_TOKEN: ${{ secrets.NPM_TOKEN }}
