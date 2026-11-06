@@ -1,0 +1,41 @@
+name: Publish to npm
+
+# 触发：推送形如 v0.1.0 / v0.2.0 的 tag 时自动发布
+# 用法：本地 `npm version patch && git push --follow-tags`，其余交给本工作流
+on:
+  push:
+    tags:
+      - 'v*.*.*'
+
+permissions:
+  contents: read
+
+jobs:
+  publish:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Setup Node + npm registry
+        uses: actions/setup-node@v4
+        with:
+          node-version: 22
+          registry-url: 'https://registry.npmjs.org'
+
+      # 安全阀：tag 版本必须与 package.json 的 version 一致，避免忘 bump 就发版
+      - name: Verify tag matches package version
+        shell: bash
+        run: |
+          PKG=$(node -p "require('./package.json').version")
+          TAG="${GITHUB_REF_NAME#v}"
+          echo "package.json version = $PKG, tag = $TAG"
+          if [ "$PKG" != "$TAG" ]; then
+            echo "::error::tag ($TAG) 与 package.json version ($PKG) 不一致，已中止发布"
+            exit 1
+          fi
+
+      - name: Publish
+        run: npm publish --access public
+        env:
+          NODE_AUTH_TOKEN: ${{ secrets.NPM_TOKEN }}
