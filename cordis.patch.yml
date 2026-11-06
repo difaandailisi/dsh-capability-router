@@ -1,0 +1,9 @@
+# dsh-capability-router bundle patch.
+# 装进来的包若被登记进 dsh.profile.bundles，DSH 会在启动时应用这一层，
+# 插件就挂上了，无需手工编辑 profile 的 cordis.patch.yml。
+#
+# 想热挂载（不重启）也可以：把下面这两行手工抄进 profile 的 cordis.patch.yml，
+# patch 层由 HMR 监视，改完即生效。
+- insert:
+    - id: capability-router
+      name: dsh-capability-router

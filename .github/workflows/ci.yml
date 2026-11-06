@@ -1,0 +1,33 @@
+name: ci
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+
+jobs:
+  test:
+    runs-on: ubuntu-latest
+    strategy:
+      fail-fast: false
+      matrix:
+        node: [20, 22, 24]
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: ${{ matrix.node }}
+      # 零运行时依赖，所以不需要 npm install —— 装了也只会拖慢 CI。
+      - name: 单元测试
+        run: node --test
+      - name: 冒烟：apply() 不得抛异常
+        run: |
+          node -e "
+          import('./index.js').then((m) => {
+            const tools = [], sections = [];
+            m.apply({ tools: { register: (t) => tools.push(t) }, systemPrompt: { section: (s) => sections.push(s) } }, {});
+            if (!tools.length) throw new Error('未注册任何工具');
+            if (!sections.length) throw new Error('未注入提示词段落');
+            console.log('ok', tools.map((t) => t.name).join(','), sections.map((s) => s.name).join(','));
+          }).catch((e) => { console.error(e); process.exit(1); });
+          "
