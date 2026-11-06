@@ -1,6 +1,6 @@
 {
   "name": "dsh-capability-router",
-  "version": "0.1.1",
+  "version": "0.1.2",
   "description": "Intent-based capability discovery for DeepSeek Harness: one natural-language need, matched across installed skills, DSH plugins and MCP servers, with match reasons. Local, read-only, zero dependencies.",
   "type": "module",
   "main": "index.js",
