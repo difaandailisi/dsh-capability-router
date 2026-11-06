@@ -21,7 +21,7 @@ jobs:
       - name: Setup Node + npm registry
         uses: actions/setup-node@v4
         with:
-          node-version: 22
+          node-version: 24   # Node 24 自带 npm 11（OIDC/Trusted Publishing 需 npm >= 11.5.1）
           registry-url: 'https://registry.npmjs.org'
 
       # 安全阀：tag 版本必须与 package.json 的 version 一致，避免忘 bump 就发版
